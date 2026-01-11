@@ -9,11 +9,13 @@ import UniPages from '@uni-helper/vite-plugin-uni-pages'
 import UniKuRoot from '@uni-ku/root'
 import UnoCSS from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import UniPolyfill from 'vite-plugin-uni-polyfill'
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   const { UNI_PLATFORM } = process.env
+  console.log('[Vite] UNI_PLATFORM:', mode)
+  const env = loadEnv(mode, process.cwd(), '')
 
   return {
     resolve: {
@@ -24,6 +26,8 @@ export default defineConfig(() => {
     },
     define: {
       __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),
+      __API_KEY__: JSON.stringify(env.API_KEY),
+      __API_BASE__: JSON.stringify(env.API_BASE),
     },
     plugins: [
       UniManifest(),

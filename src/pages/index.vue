@@ -82,14 +82,11 @@ async function onRefresh() {
 
 // 页面加载时初始化IM
 onMounted(async () => {
-  console.log('[TGO] apiKey:', apiKey.value)
-  console.log('[TGO] apiBase:', apiBase.value)
-  if (!apiKey.value || !apiBase.value) {
-    console.error('[TGO] apiKey or apiBase is empty')
-    return
+  if (!apiKey.value && !apiBase.value) {
+    console.log('[TGO] apiKey or apiBase is empty')
   }
-  await platformStore.init(apiBase.value, apiKey.value)
-  initIM({ apiBase: apiBase.value })
+  await platformStore.init(apiBase.value || __API_BASE__, apiKey.value || __API_KEY__)
+  initIM({ apiBase: apiBase.value || __API_BASE__ })
 })
 </script>
 
