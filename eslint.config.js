@@ -18,5 +18,6 @@ export default uni({
   },
   ignores: [
     'src/uni_modules/**/*',
+    'src/lib/**/*',
   ],
 })

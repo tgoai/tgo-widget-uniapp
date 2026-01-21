@@ -6,7 +6,6 @@ export type VisitorSystemInfo = {
   operating_system?: string | null
 }
 
-
 export type VisitorRegisterRequest = {
   platform_api_key: string
   name?: string | null
@@ -20,7 +19,7 @@ export type VisitorRegisterRequest = {
   note?: string | null
   custom_attributes?: Record<string, string | null>
   system_info?: VisitorSystemInfo | null
-  timezone?: string | null  // 访客时区，如 "Asia/Shanghai"
+  timezone?: string | null // 访客时区，如 "Asia/Shanghai"
 }
 
 export type VisitorRegisterResponse = {

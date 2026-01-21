@@ -2,11 +2,11 @@
 import type { ChatMessage, SystemMessagePayload } from '@/types/chat'
 
 import { formatSystemMessageContent, isSystemMessageType } from '@/types/chat'
-// @ts-ignore
-import UaMarkdown from '@/uni_modules/ua-markdown/components/ua-markdown/ua-markdown.vue'
-
 import { formatMessageTime } from '@/utils/time'
+
 import ChatLoading from './ChatLoading.vue'
+// @ts-ignore
+import Markdown from './Markdown.vue'
 
 defineProps({
   item: {
@@ -21,7 +21,7 @@ defineProps({
     <view class="message-item-content">
       <view class="message-item-box">
         <view v-if="item.payload.type === 1">
-          <UaMarkdown :source="item.payload?.content" />
+          <Markdown :source="item.payload?.content" />
         </view>
         <view v-if="item.payload.type === 2">
           <image :src="item.payload?.url" style="max-height: 200rpx; max-width: 200rpx;" />
@@ -29,7 +29,7 @@ defineProps({
         <view v-else-if="item.payload.type === 100">
           <ChatLoading v-if="!item.streamData" />
           <view v-else>
-            <UaMarkdown :source="item.streamData" />
+            <Markdown :source="item.streamData" />
           </view>
         </view>
         <view v-else-if="isSystemMessageType(item.payload.type)">
