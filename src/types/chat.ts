@@ -3,7 +3,6 @@ import type { ReasonCode } from 'easyjssdk'
 // Status is now used for transient states like uploading and sending.
 export type MessageStatus = 'uploading' | 'sending'
 
-
 // Message payload types (discriminated union)
 export type TextMessagePayload = {
   type: 1
@@ -25,7 +24,6 @@ export type FileMessagePayload = {
   size: number
 }
 
-
 export type MixedMessagePayload = {
   type: 12
   content: string
@@ -40,7 +38,6 @@ export type MixedMessagePayload = {
     size: number
   }
 }
-
 
 export type CommandMessagePayload = {
   type: 99
@@ -73,7 +70,8 @@ export function isSystemMessageType(type: number): boolean {
 
 // Format system message content by replacing {0}, {1}, etc. with extra data
 export function formatSystemMessageContent(content: string, extra?: SystemMessageExtra[]): string {
-  if (!extra || !Array.isArray(extra)) return content
+  if (!extra || !Array.isArray(extra))
+    return content
   let result = content
   extra.forEach((item, index) => {
     const name = item?.name || item?.uid || ''

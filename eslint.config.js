@@ -12,6 +12,9 @@ export default uni({
     'ts/no-use-before-define': 'off',
     'no-useless-return': 'off',
     'vue/html-self-closing': 'off',
+    'no-cond-assign': 'off',
+    'regexp/no-super-linear-backtracking': 'off',
+    'ts/consistent-type-definitions': 'off',
   },
   ignores: [
     'src/uni_modules/**/*',

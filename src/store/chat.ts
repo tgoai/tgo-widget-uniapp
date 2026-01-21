@@ -7,7 +7,7 @@ import { ReasonCode } from 'easyjssdk'
 import { defineStore } from 'pinia'
 import { fetchChannelInfo } from '@/services/channel'
 import { syncVisitorMessages } from '@/services/messageHistory'
-import { makeChatFileUrl, readImageDimensions, uploadChatFile } from '@/services/upload'
+import { getImageInfo, makeChatFileUrl, readImageDimensions, uploadChatFile, uploadFile } from '@/services/upload'
 import { loadCachedVisitor, registerVisitor, saveCachedVisitor } from '@/services/visitor'
 import IMService from '@/services/wukongim'
 import { isSystemMessageType } from '@/types/chat'
@@ -71,6 +71,7 @@ function toPayloadFromAny(raw: any): MessagePayload {
 }
 
 const pendingFiles = new Map<string, File>()
+const pendingFilePaths = new Map<string, string>()
 const uploadControllers = new Map<string, AbortController>()
 
 function mapHistoryToChatMessage(m: WuKongIMMessage, myUid?: string): ChatMessage {
@@ -507,6 +508,76 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // upload uin files to wukongim
+  async function uploadUinFiles(filePaths: string[], isImage: boolean) {
+    for (const filePath of filePaths) {
+      ;(async () => {
+        try {
+          if (!apiBase.value || !channelId.value || !channelType.value) {
+            error.value = { name: 'UploadError', message: '[Upload] Not initialized' }
+            return
+          }
+          const dimsPromise = isImage ? getImageInfo(filePath) : Promise.resolve(null)
+          const clientMsgNo = `um-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+          const id = `u-up-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+          const placeholder: ChatMessage = {
+            id,
+            role: 'user',
+            payload: { type: 1, content: isImage ? '图片上传中…' : '文件上传中…' } as any,
+            time: new Date(),
+            status: 'uploading',
+            uploadProgress: 0,
+            clientMsgNo,
+          }
+          messages.value = [...messages.value, placeholder]
+          pendingFilePaths.set(id, filePath)
+          console.log('[Upload] filePath:', filePath)
+
+          // upload file
+          try {
+            const res = await uploadFile({
+              apiBase: apiBase.value,
+              channelId: channelId.value,
+              channelType: channelType.value,
+              filePath,
+              onProgress: (p: number) => {
+                messages.value = messages.value.map(m => m.id === id ? { ...m, uploadProgress: p } : m)
+              },
+            })
+
+            const dims = await dimsPromise
+            if (isImage) {
+              const w = Math.max(1, dims?.width ?? 1)
+              const h = Math.max(1, dims?.height ?? 1)
+              const fileUrl = makeChatFileUrl(apiBase.value, res.file_id)
+              const payload: MessagePayload = { type: 2, url: fileUrl, width: w, height: h }
+              messages.value = messages.value.map(m => m.id === id ? { ...m, payload, status: 'sending', uploadProgress: undefined, uploadError: undefined } : m)
+              const result = await IMService.sendPayload(payload, { clientMsgNo })
+              messages.value = messages.value.map(m => m.id === id ? { ...m, status: undefined, reasonCode: (result?.reasonCode ?? ReasonCode.Unknown) as ReasonCode } : m)
+            }
+            else {
+              const fileUrl = makeChatFileUrl(apiBase.value, res.file_id)
+              const payload: MessagePayload = { type: 3, content: '[文件]', url: fileUrl, name: res.file_name || '', size: res.file_size ?? 0 }
+              messages.value = messages.value.map(m => m.id === id ? { ...m, payload, status: 'sending', uploadProgress: undefined, uploadError: undefined } : m)
+              const result = await IMService.sendPayload(payload, { clientMsgNo })
+              messages.value = messages.value.map(m => m.id === id ? { ...m, status: undefined, reasonCode: (result?.reasonCode ?? ReasonCode.Unknown) as ReasonCode } : m)
+            }
+
+            pendingFilePaths.delete(id)
+          }
+          catch (err: any) {
+            const aborted = err?.name === 'AbortError'
+            messages.value = messages.value.map(m => m.id === id ? { ...m, status: undefined, uploadError: aborted ? '已取消' : (err?.message || '上传失败') } : m)
+            error.value = aborted ? error : (err?.message || String(err))
+          }
+        }
+        catch (e) {
+          error.value = (e as any)?.message || String(e)
+        }
+      })()
+    }
+  }
+
   async function retryUpload(messageId: string) {
     const file = pendingFiles.get(messageId)
     if (!file)
@@ -883,6 +954,7 @@ export const useChatStore = defineStore('chat', () => {
     initIM,
     sendMessage,
     uploadFiles,
+    uploadUinFiles,
     retryUpload,
     cancelUpload,
     retryMessage,

@@ -19,4 +19,7 @@ export default defineConfig({
     pages: true,
     manifest: true,
   },
+  devtools: {
+    open: true,
+  },
 })

@@ -23,6 +23,9 @@ defineProps({
         <view v-if="item.payload.type === 1">
           <UaMarkdown :source="item.payload?.content" />
         </view>
+        <view v-if="item.payload.type === 2">
+          <image :src="item.payload?.url" style="max-height: 200rpx; max-width: 200rpx;" />
+        </view>
         <view v-else-if="item.payload.type === 100">
           <ChatLoading v-if="!item.streamData" />
           <view v-else>

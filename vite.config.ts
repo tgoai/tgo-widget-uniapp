@@ -14,7 +14,6 @@ import UniPolyfill from 'vite-plugin-uni-polyfill'
 
 export default defineConfig(({ mode }) => {
   const { UNI_PLATFORM } = process.env
-  console.log('[Vite] UNI_PLATFORM:', mode)
   const env = loadEnv(mode, process.cwd(), '')
 
   return {

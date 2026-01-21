@@ -1,3 +1,4 @@
+import { un } from '@uni-helper/uni-network'
 import { resolveApiKey } from '@/utils/url'
 
 export interface ChatFileUploadResponse {
@@ -17,6 +18,15 @@ export interface UploadParams {
   channelId: string
   channelType: number
   file: File
+  onProgress?: (percent: number, loaded: number, total: number) => void
+  signal?: AbortSignal
+}
+
+export interface UploadUniParams {
+  apiBase: string
+  channelId: string
+  channelType: number
+  filePath: string
   onProgress?: (percent: number, loaded: number, total: number) => void
   signal?: AbortSignal
 }
@@ -107,6 +117,36 @@ export function uploadChatFile({ apiBase, channelId, channelType, file, onProgre
   })
 }
 
+export async function uploadFile({ apiBase, channelId, channelType, filePath, onProgress, signal }: UploadUniParams): Promise<ChatFileUploadResponse> {
+  const base = apiBase.replace(/\/$/, '')
+  const url = `${base}/v1/chat/upload`
+  console.log('[Upload] uploadFile:', url, filePath, channelId, channelType)
+
+  const res = await un.upload({
+    url,
+    filePath,
+    formData: { channel_id: channelId, channel_type: channelType },
+    headers: { 'X-Platform-API-Key': resolveApiKey() },
+    name: 'file',
+    signal,
+    onProgress: (e: any) => {
+      if (!e.totalBytesExpectedToSend)
+        return onProgress?.(0, 0, 0)
+      const p = Math.min(100, Math.round((e.totalBytesSent / Math.max(1, e.totalBytesExpectedToSend)) * 100))
+      onProgress?.(p, e.totalBytesSent, e.totalBytesExpectedToSend)
+    },
+  })
+
+  if (res.status !== 200) {
+    throw new Error(`[Upload] failed: ${res.status} ${res.errMsg}`)
+  }
+  const data = typeof res.data === 'string' ? JSON.parse(res.data) as ChatFileUploadResponse : res.data as ChatFileUploadResponse
+  if (!data || !data.file_id) {
+    throw new Error('[Upload] invalid response')
+  }
+  return data
+}
+
 export async function readImageDimensions(file: File): Promise<{ width: number, height: number } | null> {
   if (!file.type.startsWith('image/'))
     return null
@@ -138,5 +178,20 @@ export async function readImageDimensions(file: File): Promise<{ width: number, 
       img.src = url
     }
     catch { resolve(null) }
+  })
+}
+
+export async function getImageInfo(filePath: string): Promise<{ width: number, height: number } | null> {
+  return new Promise((resolve) => {
+    uni.getImageInfo({
+      src: filePath,
+      success(image) {
+        resolve({ width: image.width, height: image.height })
+      },
+      fail(err) {
+        console.log(err)
+        resolve(null)
+      },
+    })
   })
 }

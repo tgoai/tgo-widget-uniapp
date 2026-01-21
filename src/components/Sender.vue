@@ -47,6 +47,28 @@ function onCancelSend() {
     void chatStore.cancelStreaming('user_click')
   }
 }
+
+const isShowMore = ref(false)
+// 选择照片
+function onPhoto() {
+  uni.chooseImage({
+    count: 1,
+    success: (res: any) => {
+      console.log('[Sender] chooseImage success:', res)
+      chatStore.uploadUinFiles(res.tempFilePaths as string[], true)
+    },
+  })
+}
+// 选择视频
+function onVideo() {
+  uni.chooseVideo({
+    count: 1,
+    success: (res: any) => {
+      console.log('[Sender] chooseVideo success:', res)
+      chatStore.uploadUinFiles([res.tempFilePath], false)
+    },
+  })
+}
 </script>
 
 <template>
@@ -71,6 +93,24 @@ function onCancelSend() {
       <wd-button v-else custom-class="!min-w-auto !px-[14rpx]" @click="onCancelSend">
         <wd-icon name="stop-circle" :size="22"></wd-icon>
       </wd-button>
+    </view>
+    <view v-if="isShowMore" class="box-border h-300rpx flex gap-8 py-3">
+      <view class="flex flex-col items-center" @click="onPhoto">
+        <view class="h-120rpx w-120rpx flex items-center justify-center rounded-20rpx bg-[#fff]">
+          <wd-icon name="image" :size="26"></wd-icon>
+        </view>
+        <text class="mt-2 text-[24rpx] text-[#666]">
+          照片
+        </text>
+      </view>
+      <view class="flex flex-col items-center" @click="onVideo">
+        <view class="h-120rpx w-120rpx flex items-center justify-center rounded-20rpx bg-[#fff]">
+          <wd-icon name="photo" :size="26"></wd-icon>
+        </view>
+        <text class="mt-2 text-[24rpx] text-[#666]">
+          视频
+        </text>
+      </view>
     </view>
   </view>
 </template>
