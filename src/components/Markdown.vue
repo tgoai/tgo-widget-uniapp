@@ -103,7 +103,7 @@ function handleItemClick(e) {
   }
 }
 
-const UI_WIDGET_REGEX = /```tgo-ui-widget\s*([\s\S]*?)```/gi
+const UI_WIDGET_REGEX = /```tgo-ui-widget\s*([\s\S]*?)\n?```/gi
 
 function generateBlockId() {
   return `ui-block-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
@@ -120,7 +120,10 @@ function replaceUIWidgetsWithPlaceholders(content) {
     (match, jsonContent) => {
       try {
         // Trim the JSON content and remove any trailing newlines before the closing ```
-        const trimmedJson = jsonContent.trim()
+        let trimmedJson = jsonContent.trim()
+        trimmedJson = trimmedJson.replace(/:\s*,/g, ': null,') // 修复 "key":
+          .replace(/,\s*\}/g, '}') // 修复尾随逗号
+          .replace(/,\\s*\\{3}/g, ']') // 修复双反斜杠模式
 
         const data = JSON.parse(trimmedJson)
         const blockId = generateBlockId()
@@ -135,7 +138,11 @@ function replaceUIWidgetsWithPlaceholders(content) {
         })
 
         // Return a placeholder that can be replaced with the rendered component
-        return `\n\n<div data-ui-widget="${blockId}"></div>\n\n`
+        return `
+
+<div data-ui-widget="${blockId}"></div>
+
+`
       }
       catch (e) {
         // If parsing fails, log and return original content
