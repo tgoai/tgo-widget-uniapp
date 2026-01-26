@@ -109,23 +109,6 @@ function generateBlockId() {
   return `ui-block-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 }
 
-// Helper function to fix common JSON formatting issues
-function removeTrailingCommas(jsonStr) {
-  try {
-    // First remove trailing commas before closing braces/brackets
-    let fixed = jsonStr.replace(/,\s*([}\]])/g, '$1')
-
-    // Handle potential cases where there might be extra characters
-    fixed = fixed.trim()
-
-    return fixed
-  }
-  catch (e) {
-    console.warn('Error in removing trailing commas:', e)
-    return jsonStr // Return original if fix fails
-  }
-}
-
 function replaceUIWidgetsWithPlaceholders(content) {
   const blocks = new Map()
 
@@ -137,12 +120,8 @@ function replaceUIWidgetsWithPlaceholders(content) {
     (match, jsonContent) => {
       try {
         // Trim the JSON content and remove any trailing newlines before the closing ```
-        let trimmedJson = jsonContent.trim()
+        const trimmedJson = jsonContent.trim()
 
-        // Attempt to fix common JSON formatting issues
-        trimmedJson = removeTrailingCommas(trimmedJson)
-
-        // Ensure the content is valid JSON by attempting to parse it
         const data = JSON.parse(trimmedJson)
         const blockId = generateBlockId()
 
