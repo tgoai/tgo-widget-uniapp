@@ -734,3 +734,4 @@ watch(
     overflow-x: auto;
   }
 }
+</style>
