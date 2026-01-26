@@ -139,8 +139,7 @@ function replaceUIWidgetsWithPlaceholders(content) {
       }
       catch (e) {
         // If parsing fails, log and return original content
-        console.error('Failed to parse UI Widget JSON:', e, 'Content:', jsonContent?.substring(0, 200))
-        console.error('JSON Parse Error Position Info:', e.message)
+        console.error('Failed to parse UI Widget JSON:', e, 'Content:', jsonContent?.substring(0, 100))
         return match
       }
     },
