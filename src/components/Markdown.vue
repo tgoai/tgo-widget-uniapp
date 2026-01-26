@@ -135,9 +135,7 @@ function replaceUIWidgetsWithPlaceholders(content) {
         })
 
         // Return a placeholder that can be replaced with the rendered component
-        return `
-<div data-ui-widget="${blockId}"></div>
-`
+        return `\n\n<div data-ui-widget="${blockId}"></div>\n\n`
       }
       catch (e) {
         // If parsing fails, log and return original content
