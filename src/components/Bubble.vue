@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { ChatMessage, SystemMessagePayload } from '@/types/chat'
+import type { PropType } from 'vue'
+import type { ChatMessage, ImageMessagePayload, SystemMessagePayload, TextMessagePayload } from '@/types/chat'
 
 import { formatSystemMessageContent, isSystemMessageType } from '@/types/chat'
 import { formatMessageTime } from '@/utils/time'
@@ -20,17 +21,19 @@ defineProps({
   <view class="message-item" :class="{ 'is-self': item.role === 'user', 'is-agent': item.role === 'agent' }">
     <view class="message-item-content">
       <view class="message-item-box">
+        <!-- 文本消息 -->
         <view v-if="item.payload.type === 1">
-          <Markdown :source="item.payload?.content" />
+          <Markdown :source="(item.payload as TextMessagePayload)?.content" />
         </view>
+        <!-- 图片消息 -->
         <view v-if="item.payload.type === 2">
-          <image :src="item.payload?.url" style="max-height: 200rpx; max-width: 200rpx;" />
+          <image :src="(item.payload as ImageMessagePayload)?.url" style="max-height: 200rpx; max-width: 200rpx;" />
         </view>
+        <!-- 流式消息 -->
+        <Markdown v-else-if="item.streamData && item.streamData.length" :source="item.streamData" />
+        <!-- 加载中消息 -->
         <view v-else-if="item.payload.type === 100">
           <ChatLoading v-if="!item.streamData" />
-          <view v-else>
-            <Markdown :source="item.streamData" />
-          </view>
         </view>
         <view v-else-if="isSystemMessageType(item.payload.type)">
           {{ formatSystemMessageContent((item.payload as SystemMessagePayload)?.content, (item.payload as SystemMessagePayload)?.extra) }}

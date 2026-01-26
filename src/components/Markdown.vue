@@ -3,6 +3,8 @@
 import hljs from '@/lib/highlight/uni-highlight.min.js'
 import parseHtml from '@/lib/html-parser.js'
 import MarkdownIt from '@/lib/markdown-it.min.js'
+import Widget from './widget/index.vue'
+
 import '@/lib/highlight/atom-one-dark.css'
 
 const props = defineProps({
@@ -107,6 +109,23 @@ function generateBlockId() {
   return `ui-block-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 }
 
+// Helper function to fix common JSON formatting issues
+function removeTrailingCommas(jsonStr) {
+  try {
+    // First remove trailing commas before closing braces/brackets
+    let fixed = jsonStr.replace(/,\s*([}\]])/g, '$1')
+
+    // Handle potential cases where there might be extra characters
+    fixed = fixed.trim()
+
+    return fixed
+  }
+  catch (e) {
+    console.warn('Error in removing trailing commas:', e)
+    return jsonStr // Return original if fix fails
+  }
+}
+
 function replaceUIWidgetsWithPlaceholders(content) {
   const blocks = new Map()
 
@@ -118,7 +137,12 @@ function replaceUIWidgetsWithPlaceholders(content) {
     (match, jsonContent) => {
       try {
         // Trim the JSON content and remove any trailing newlines before the closing ```
-        const trimmedJson = jsonContent.trim()
+        let trimmedJson = jsonContent.trim()
+
+        // Attempt to fix common JSON formatting issues
+        trimmedJson = removeTrailingCommas(trimmedJson)
+
+        // Ensure the content is valid JSON by attempting to parse it
         const data = JSON.parse(trimmedJson)
         const blockId = generateBlockId()
 
@@ -132,11 +156,14 @@ function replaceUIWidgetsWithPlaceholders(content) {
         })
 
         // Return a placeholder that can be replaced with the rendered component
-        return `\n\n<div data-ui-widget="${blockId}"></div>\n\n`
+        return `
+<div data-ui-widget="${blockId}"></div>
+`
       }
       catch (e) {
         // If parsing fails, log and return original content
-        console.error('Failed to parse UI Widget JSON:', e, 'Content:', jsonContent?.substring(0, 100))
+        console.error('Failed to parse UI Widget JSON:', e, 'Content:', jsonContent?.substring(0, 200))
+        console.error('JSON Parse Error Position Info:', e.message)
         return match
       }
     },
@@ -234,12 +261,14 @@ watch(
       const { content, blocks } = replaceUIWidgetsWithPlaceholders(processedMarkdown)
       const hasWidgets = blocks.size > 0
       isHasWidgets.value = hasWidgets
+      console.log('hasWidgets', hasWidgets)
       if (hasWidgets) {
         const hr = parseNodes(content)
         const par = getHtml(hr)
         widgetBlocks.value = blocks
         parts.value = par
         console.log(par)
+        console.log(widgetBlocks.value)
       }
       else {
         html.value = parseNodes(content)
@@ -257,10 +286,18 @@ watch(
   <view class="ua__markdown">
     <template v-if="isHasWidgets">
       <template v-for="(part, index) in parts" :key="part.blockId || index">
-        <rich-text v-if="part.type === 'html'" space="nbsp" :nodes="part.content" @itemclick="handleItemClick"></rich-text>
-        <view v-if="part.type === 'widget'">
-          自定义组件
-        </view>
+        <rich-text
+          v-if="part.type === 'html'"
+          space="nbsp"
+          :nodes="part.content"
+          @itemclick="handleItemClick"
+        >
+        </rich-text>
+        <Widget
+          v-if="part.type === 'widget'"
+          :type="widgetBlocks.get(part.blockId).type"
+          :data="widgetBlocks.get(part.blockId).data"
+        />
       </template>
     </template>
     <template v-else>
@@ -697,4 +734,3 @@ watch(
     overflow-x: auto;
   }
 }
-</style>
