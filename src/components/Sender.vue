@@ -88,10 +88,10 @@ function onVideo() {
         @keyboardheightchange="onKeyboardheightchange"
       >
       <wd-button v-if="!isSend" custom-class="!min-w-auto !px-[14rpx]" @click="onSend">
-        <wd-icon name="arrow-up1" :size="22"></wd-icon>
+        <view i-carbon:send-alt-filled class="text-[38rpx]"></view>
       </wd-button>
       <wd-button v-else custom-class="!min-w-auto !px-[14rpx]" @click="onCancelSend">
-        <wd-icon name="stop-circle" :size="22"></wd-icon>
+        <view i-carbon:stop-filled class="text-[38rpx]"></view>
       </wd-button>
     </view>
     <view v-if="isShowMore" class="box-border h-300rpx flex gap-8 py-3">
