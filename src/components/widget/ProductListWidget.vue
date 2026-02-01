@@ -36,41 +36,35 @@ const props = defineProps<{ data: ProductListWidgetData }>()
   </wd-card>
 </template>
 
-<style lang="scss">
+<style>
 .product-list-widget {
   @apply !mx-0 !bg-#f5f5f5 !py-3;
-
-  .product-title {
-    @apply mb-2;
-    .title-text {
-      @apply flex items-center  text-#333333 text-lg font-bold;
-    }
-    .subtitle-text {
-      @apply text-#666666 text-sm;
-    }
-  }
-
-  .product-list{
-    @apply grid grid-cols-2 gap-4 ;
-
-    .product-item{
-      @apply  bg-gray-700/50 rounded-lg overflow-hidden;
-
-      .product-item-image{
-        @apply w-full h-160rpx;
-        image{
-          @apply w-full h-full;
-        }
-      }
-
-      .product-item-title{
-        @apply text-#fff text-26rpx font-bold px-2 mt-2;
-      }
-
-      .product-item-price{
-        @apply text-#e4393c text-sm font-bold px-2 mb-2;
-      }
-    }
-  }
+}
+.product-list-widget .product-title {
+  @apply mb-2;
+}
+.product-list-widget .product-title .title-text {
+  @apply flex items-center  text-#333333 text-lg font-bold;
+}
+.product-list-widget .product-title .subtitle-text {
+  @apply text-#666666 text-sm;
+}
+.product-list-widget .product-list {
+  @apply grid grid-cols-2 gap-4;
+}
+.product-list-widget .product-list .product-item {
+  @apply bg-gray-700/50 rounded-lg overflow-hidden;
+}
+.product-list-widget .product-list .product-item .product-item-image {
+  @apply w-full h-160rpx;
+}
+.product-list-widget .product-list .product-item .product-item-image image {
+  @apply w-full h-full;
+}
+.product-list-widget .product-list .product-item .product-item-title {
+  @apply text-#fff text-26rpx font-bold px-2 mt-2;
+}
+.product-list-widget .product-list .product-item .product-item-price {
+  @apply text-#e4393c text-sm font-bold px-2 mb-2;
 }
 </style>

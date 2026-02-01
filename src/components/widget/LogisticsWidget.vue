@@ -62,25 +62,26 @@ const props = defineProps<{ data: LogisticsWidgetData }>()
   </wd-card>
 </template>
 
-<style lang="scss">
+<style>
 .logistics-widget {
   @apply !mx-0 !bg-#f5f5f5;
+}
 
-  .title {
+.logistics-widget .title {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
-  .logistics-widget-content{
+.logistics-widget .logistics-widget-content{
 
-    .estimated-delivery {
-      @apply text-[#16a34a] text-[28rpx] flex items-center gap-[10rpx] p-[10rpx] mb-[10rpx];
-    }
+}
 
-    .courier-info {
-      @apply text-[28rpx] flex items-center gap-[10rpx] p-[10rpx] mb-[10rpx];
-    }
-  }
+.logistics-widget .logistics-widget-content .estimated-delivery {
+  @apply text-[#16a34a] text-[28rpx] flex items-center gap-[10rpx] p-[10rpx] mb-[10rpx];
+}
+
+.logistics-widget .logistics-widget-content .courier-info {
+  @apply text-[28rpx] flex items-center gap-[10rpx] p-[10rpx] mb-[10rpx];
 }
 </style>

@@ -113,66 +113,58 @@ const props = defineProps<{ data: OrderWidgetData }>()
   </wd-card>
 </template>
 
-<style lang="scss">
+<style>
 .order-widget {
   @apply !mx-0 !bg-#f5f5f5;
-
-  .title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .title-status {
-    display: none;
-  }
-
-  .goods {
-    @apply flex flex-col gap-2;
-
-    &-list {
-      margin-bottom: 10rpx;
-    }
-
-    &-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 10rpx;
-    }
-
-    &-info{
-      gap: 5rpx;
-      @apply flex flex-col;
-    }
-
-    &-price-info {
-      position: relative;
-      padding: 12rpx 0;
-      @apply flex flex-col;
-      &::after {
-        position: absolute;
-        display: block;
-        content: "";
-        width: 100%;
-        height: 1px;
-        left: 0;
-        top: 0;
-        -webkit-transform: scaleY(.5);
-        transform: scaleY(.5);
-        background: var(--wot-card-content-border-color, rgba(0, 0, 0, .09));
-      }
-    }
-    &-price-item {
-      gap: 5rpx;
-      @apply flex items-center justify-between;
-    }
-
-    &-receiver-info {
-      @apply mt-2 p-3 bg-gray-700/50 rounded-lg text-sm text-#fff;
-    }
-
-    &-logistics-info {
-      @apply mt-2;
-    }
-  }
+}
+.order-widget .title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.order-widget .title-status {
+  display: none;
+}
+.order-widget .goods {
+  @apply flex flex-col gap-2;
+}
+.order-widget .goods-list {
+  margin-bottom: 10rpx;
+}
+.order-widget .goods-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+.order-widget .goods-info {
+  gap: 5rpx;
+  @apply flex flex-col;
+}
+.order-widget .goods-price-info {
+  position: relative;
+  padding: 12rpx 0;
+  @apply flex flex-col;
+}
+.order-widget .goods-price-info::after {
+  position: absolute;
+  display: block;
+  content: "";
+  width: 100%;
+  height: 1px;
+  left: 0;
+  top: 0;
+  -webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);
+  background: var(--wot-card-content-border-color, rgba(0, 0, 0, 0.09));
+}
+.order-widget .goods-price-item {
+  gap: 5rpx;
+  @apply flex items-center justify-between;
+}
+.order-widget .goods-receiver-info {
+  @apply mt-2 p-3 bg-gray-700/50 rounded-lg text-sm text-#fff;
+}
+.order-widget .goods-logistics-info {
+  @apply mt-2;
 }
 </style>

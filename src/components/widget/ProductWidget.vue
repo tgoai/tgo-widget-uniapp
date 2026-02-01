@@ -89,46 +89,41 @@ const hasDiscount = computed(() => props.data.price && props.data.original_price
   </wd-card>
 </template>
 
-<style lang="scss">
+<style>
   .product-widget {
-    @apply !mx-0 !bg-#f5f5f5 !py-3;
-
-    .title {
-      @apply text-[32rpx] font-bold flex items-center mb-[10rpx];
-    }
-
-    .image {
-      @apply w-full h-[200rpx] object-cover rounded-[10rpx] mb-[10rpx];
-    }
-
-    .tags {
-      @apply flex items-center flex-wrap mb-[10rpx];
-    }
-
-    .name {
-      @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
-    }
-    .brand {
-      @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
-    }
-    .description {
-      @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
-    }
-    .specs {
-      @apply flex items-start flex-wrap mb-[10rpx];
-      .spec-item {
-        @apply flex items-center;
-        .spec-name {
-          @apply text-[#999] text-[24rpx] font-medium flex items-center mr-[10rpx];
-        }
-        .spec-value {
-          @apply text-[#333] text-[24rpx] font-medium flex items-center;
-        }
-      }
-    }
-
-    .actions {
-      @apply flex items-center justify-end;
-    }
-  }
+  @apply !mx-0 !bg-#f5f5f5 !py-3;
+}
+.product-widget .title {
+  @apply text-[32rpx] font-bold flex items-center mb-[10rpx];
+}
+.product-widget .image {
+  @apply w-full h-[200rpx] object-cover rounded-[10rpx] mb-[10rpx];
+}
+.product-widget .tags {
+  @apply flex items-center flex-wrap mb-[10rpx];
+}
+.product-widget .name {
+  @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
+}
+.product-widget .brand {
+  @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
+}
+.product-widget .description {
+  @apply text-[#333] text-[28rpx] font-medium flex items-start mb-[10rpx];
+}
+.product-widget .specs {
+  @apply flex items-start flex-wrap mb-[10rpx];
+}
+.product-widget .specs .spec-item {
+  @apply flex items-center;
+}
+.product-widget .specs .spec-item .spec-name {
+  @apply text-[#999] text-[24rpx] font-medium flex items-center mr-[10rpx];
+}
+.product-widget .specs .spec-item .spec-value {
+  @apply text-[#333] text-[24rpx] font-medium flex items-center;
+}
+.product-widget .actions {
+  @apply flex items-center justify-end;
+}
 </style>
