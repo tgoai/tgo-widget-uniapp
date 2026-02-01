@@ -58,7 +58,6 @@ class TgoWidget {
     // 获取系统信息
     const sysinfo = uni.getSystemInfoSync()
     const { model, platform, system, osName, version } = sysinfo
-    console.log('[TgoWidget] sys', { model, platform, system, osName, version })
     platformStore.setSystemInfo({ model, platform, system, osName, version })
   }
 
