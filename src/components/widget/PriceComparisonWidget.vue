@@ -20,11 +20,11 @@ const props = defineProps<{ data: PriceComparisonWidgetData }>()
 
     <!-- 价格比较表格 -->
     <wd-table :data="data.items">
-      <wd-table-column v-for="column in data.columns" :key="column" :label="column">
+      <wd-table-col v-for="column in data.columns" :key="column" :prop="column" :label="column">
         <template #default="{ row }">
           {{ row[column] }}
         </template>
-      </wd-table-column>
+      </wd-table-col>
     </wd-table>
 
     <!-- 推荐原因 -->

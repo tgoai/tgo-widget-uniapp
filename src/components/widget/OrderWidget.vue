@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OrderStatus, OrderWidgetData } from './types'
+import type { OrderWidgetData } from './types'
 import { formatPrice } from './shared'
 
 defineOptions({

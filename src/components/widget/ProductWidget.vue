@@ -25,12 +25,12 @@ const hasDiscount = computed(() => props.data.price && props.data.original_price
 
     <!-- 图片 -->
     <view v-if="data.thumbnail" class="image">
-      <wd-image :src="data.thumbnail?.url" :alt="data.thumbnail?.alt" />
+      <wd-img :src="data.thumbnail?.url" :alt="data.thumbnail?.alt" />
     </view>
 
     <!-- 标签 -->
     <view v-if="data.tags && data.tags.length > 0" class="tags">
-      <wd-tag v-for="tag in data.tags.slice(0, 3)" :key="tag" class="tag">
+      <wd-tag v-for="tag in data.tags.slice(0, 3)" :key="tag" custom-class="tag">
         {{ tag }}
       </wd-tag>
     </view>
@@ -92,6 +92,7 @@ const hasDiscount = computed(() => props.data.price && props.data.original_price
 <style lang="scss">
   .product-widget {
     @apply !mx-0 !bg-#f5f5f5 !py-3;
+
     .title {
       @apply text-[32rpx] font-bold flex items-center mb-[10rpx];
     }
