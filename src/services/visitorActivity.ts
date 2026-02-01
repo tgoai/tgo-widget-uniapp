@@ -86,11 +86,12 @@ export async function recordVisitorActivity(params: {
       // keepalive allows the request to outlive the page lifecycle (used on unload)
       keepalive,
     })
-    if (res.status !== 200) {
-      throw new Error(`[Activity] record failed: ${res.status} ${res.errMsg}`)
+    const { status, data, errMsg } = res as unknown as { status: number, data: VisitorActivityCreateResponse, errMsg?: string }
+    if (status >= 200 && status < 300) {
+      return data
     }
-    const data = res.data as VisitorActivityCreateResponse
-    return data
+
+    throw new Error(`[Activity] record failed: ${status} ${errMsg}`)
   }
   finally {
     clearTimeout(timer)

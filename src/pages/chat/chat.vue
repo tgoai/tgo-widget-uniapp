@@ -3,6 +3,7 @@ import { isH5 } from '@uni-helper/uni-env'
 import Bubble from '@/components/Bubble.vue'
 
 import Sender from '@/components/Sender.vue'
+import { recordVisitorActivity } from '@/services/visitorActivity'
 import { useChatStore } from '@/store/chat'
 import { usePlatformStore } from '@/store/platform'
 
@@ -41,10 +42,12 @@ watch(
   (newMessages) => {
     if (newMessages.length > 0) {
       setScrollbarPosition()
+      console.log('[Chat] New message received, scrolling to bottom')
     }
   },
   {
     deep: true,
+    immediate: true,
   },
 )
 
@@ -78,13 +81,116 @@ async function onRefresh() {
   refresherTriggered.value = false
 }
 
+const sessionStarted = ref(false)
+const sessionStartAt = ref(0)
+const pagesVisited = ref(0)
+const sessionEndSent = ref(false)
+
+const SS_STARTED_AT = 'tgo_session_started_at'
+const SS_PAGES = 'tgo_session_pages'
+
+try {
+  const s = uni.getStorageSync(SS_STARTED_AT)
+  if (s) {
+    sessionStarted.value = true
+    sessionStartAt.value = Number.parseInt(s, 10) || 0
+    const pv = Number.parseInt(uni.getStorageSync(SS_PAGES) || '0', 10)
+    pagesVisited.value = isNaN(pv) ? 0 : pv
+  }
+}
+catch {}
+
+function markSessionStarted() {
+  sessionStarted.value = true
+  sessionStartAt.value = Date.now()
+  pagesVisited.value = 0
+  sessionEndSent.value = false
+  uni.setStorageSync(SS_STARTED_AT, String(sessionStartAt.value))
+  uni.setStorageSync(SS_PAGES, '0')
+}
+
+function incPagesVisited() {
+  pagesVisited.value += 1
+  uni.setStorageSync(SS_PAGES, String(pagesVisited.value))
+}
+
+async function sendSessionStart() {
+  const currentUrl = '/pages/index'
+  const currentReferrer = '/pages/index'
+  // 获取用户ID
+
+  const uid = chatStore.myUid
+  if (!platformStore._apiBase || !platformStore._platformApiKey || !uid)
+    return
+  let visitorId = ''
+  if (uid && uid.endsWith('-vtr')) {
+    visitorId = uid.substring(0, uid.length - 4)
+  }
+  else {
+    visitorId = uid
+  }
+  markSessionStarted()
+
+  void recordVisitorActivity({
+    apiBase: platformStore._apiBase as string,
+    visitorId,
+    activityType: 'session_start',
+    title: 'Session started',
+    context: { page_url: currentUrl, referrer: currentReferrer || '' },
+  }).catch(err => console.warn('[Activity] Failed to record session_start', err))
+  incPagesVisited()
+}
+
+function sendSessionEnd(source?: string) {
+  if (sessionEndSent.value || !sessionStarted.value) {
+    console.warn('[Activity] sendSessionEnd skipped: already sent or session not started', { sessionEndSent: sessionEndSent.value, sessionStarted: sessionStarted.value, source })
+    return
+  }
+
+  sessionEndSent.value = true
+
+  const currentUrl = '/pages/index'
+  const currentReferrer = '/pages/index'
+  const uid = chatStore.myUid
+  const apiBase = platformStore._apiBase
+  if (!apiBase || !platformStore._platformApiKey || !uid)
+    return
+  let visitorId = ''
+  if (uid && uid.endsWith('-vtr')) {
+    visitorId = uid.substring(0, uid.length - 4)
+  }
+  else {
+    visitorId = uid
+  }
+
+  const now = Date.now()
+  const total = sessionStartAt.value ? Math.max(0, Math.round((now - sessionStartAt.value) / 1000)) : null
+
+  void recordVisitorActivity({
+    apiBase,
+    visitorId,
+    activityType: 'session_end',
+    title: 'Session ended',
+    durationSeconds: total ?? undefined,
+    context: { page_url: currentUrl, referrer: currentReferrer || '', metadata: { pages_visited: pagesVisited } },
+    keepalive: true,
+  }).catch(err => console.warn('[Activity] Failed to record session_end', err))
+}
+
 // 页面加载时初始化IM
 onMounted(async () => {
   if (!apiKey.value && !apiBase.value) {
     console.log('[TGO] apiKey or apiBase is empty')
   }
-  await platformStore.init(apiBase.value || __API_BASE__, apiKey.value || __API_KEY__)
-  initIM({ apiBase: apiBase.value || __API_BASE__ })
+  // await platformStore.init(apiBase.value || __API_BASE__, apiKey.value || __API_KEY__)
+  // await initIM({ apiBase: apiBase.value || __API_BASE__ })
+
+  await sendSessionStart()
+})
+
+onBeforeUnmount(() => {
+  sendSessionEnd('flush_exit')
+  console.log('[TGO] App is closing')
 })
 </script>
 

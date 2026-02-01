@@ -13,6 +13,7 @@ export default uni({
     'no-useless-return': 'off',
     'vue/html-self-closing': 'off',
     'no-cond-assign': 'off',
+    'unicorn/prefer-number-properties': 'off',
     'regexp/no-super-linear-backtracking': 'off',
     'ts/consistent-type-definitions': 'off',
   },
