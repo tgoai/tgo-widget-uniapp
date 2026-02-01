@@ -9,6 +9,8 @@ import { usePlatformStore } from '@/store/platform'
 
 const { value: apiKey } = useQuery('apiKey')
 const { value: apiBase } = useQuery('apiBase')
+const { value: currentUrl } = useQuery('currentUrl')
+const { value: currentReferrer } = useQuery('currentReferrer')
 
 definePage(() => {
   if (!isH5) {
@@ -115,10 +117,9 @@ function incPagesVisited() {
 }
 
 async function sendSessionStart() {
-  const currentUrl = '/pages/index'
-  const currentReferrer = '/pages/index'
+  const page_url = currentUrl.value || '/pages/index/index'
+  const referrer = currentReferrer.value || ''
   // 获取用户ID
-
   const uid = chatStore.myUid
   if (!platformStore._apiBase || !platformStore._platformApiKey || !uid)
     return
@@ -136,7 +137,7 @@ async function sendSessionStart() {
     visitorId,
     activityType: 'session_start',
     title: 'Session started',
-    context: { page_url: currentUrl, referrer: currentReferrer || '' },
+    context: { page_url, referrer },
   }).catch(err => console.warn('[Activity] Failed to record session_start', err))
   incPagesVisited()
 }
@@ -148,9 +149,8 @@ function sendSessionEnd(source?: string) {
   }
 
   sessionEndSent.value = true
-
-  const currentUrl = '/pages/index'
-  const currentReferrer = '/pages/index'
+  const page_url = currentUrl.value || '/pages/index/index'
+  const referrer = currentReferrer.value || ''
   const uid = chatStore.myUid
   const apiBase = platformStore._apiBase
   if (!apiBase || !platformStore._platformApiKey || !uid)
@@ -172,7 +172,7 @@ function sendSessionEnd(source?: string) {
     activityType: 'session_end',
     title: 'Session ended',
     durationSeconds: total ?? undefined,
-    context: { page_url: currentUrl, referrer: currentReferrer || '', metadata: { pages_visited: pagesVisited } },
+    context: { page_url, referrer, metadata: { pages_visited: pagesVisited } },
     keepalive: true,
   }).catch(err => console.warn('[Activity] Failed to record session_end', err))
 }

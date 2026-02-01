@@ -15,6 +15,14 @@ const defaultConfig: PlatformConfig = {
 const WELCOME_KEY = (apiBase: string, platformApiKey: string) => `tgo:welcome-shown:${apiBase}:${platformApiKey}`
 const EXPANDED_KEY = (apiBase: string, platformApiKey: string) => `tgo:expanded:${apiBase}:${platformApiKey}`
 
+interface VisitorSystemInfo {
+  model: string
+  platform: string
+  system: string
+  osName: string
+  version: string
+}
+
 export const usePlatformStore = defineStore('platform', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -26,6 +34,7 @@ export const usePlatformStore = defineStore('platform', () => {
 
   const _apiBase = ref<string | undefined>(undefined)
   const _platformApiKey = ref<string | undefined>(undefined)
+  const systemInfo = ref<VisitorSystemInfo | null>(null)
 
   function setConfig(newConfig: PlatformConfig) {
     config.value = { ...config.value, ...newConfig }
@@ -41,6 +50,10 @@ export const usePlatformStore = defineStore('platform', () => {
 
   function toggleExpanded() {
     setExpanded(!isExpanded.value)
+  }
+
+  function setSystemInfo(info: VisitorSystemInfo) {
+    systemInfo.value = info
   }
 
   function markWelcomeInjected() {
@@ -107,8 +120,10 @@ export const usePlatformStore = defineStore('platform', () => {
     welcomeInjected,
     _apiBase,
     _platformApiKey,
+    systemInfo,
     setConfig,
     setExpanded,
+    setSystemInfo,
     toggleExpanded,
     markWelcomeInjected,
     init,

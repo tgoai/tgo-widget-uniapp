@@ -109,9 +109,11 @@ function getSourceDetail(): string | null {
 
 export function collectVisitorSystemInfo(): VisitorSystemInfo | null {
   try {
+    const sysinfo = uni.getSystemInfoSync()
+    const { model, platform, system, version } = sysinfo
     const ua = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : ''
-    const browser = ua ? parseBrowser(ua) : null
-    const os = ua ? parseOS(ua) : null
+    const browser = ua ? parseBrowser(ua) : `${platform} ${system} ${version}`
+    const os = `${model} ${platform} ${system}`
     const source = getSourceDetail()
 
     const hasAny = !!(browser || os || source)

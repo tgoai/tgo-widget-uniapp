@@ -55,14 +55,21 @@ class TgoWidget {
     await platformStore.init(apiBase, apiKey)
     const { initIM } = useChatStore()
     initIM({ apiBase })
+    // 获取系统信息
+    const sysinfo = uni.getSystemInfoSync()
+    const { model, platform, system, osName, version } = sysinfo
+    console.log('[TgoWidget] sys', { model, platform, system, osName, version })
+    platformStore.setSystemInfo({ model, platform, system, osName, version })
   }
 
   /**
    * 显示
    */
   public show() {
+    const pages = getCurrentPages()
+    const page = pages[pages.length - 1]
     uni.navigateTo({
-      url: '/pages/chat/chat',
+      url: `/pages/chat/chat?currentUrl=${page.route}&currentReferrer=${page.route}`,
     })
   }
 
