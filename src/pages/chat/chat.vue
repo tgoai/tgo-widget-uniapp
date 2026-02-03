@@ -208,7 +208,7 @@ onBeforeUnmount(() => {
       :scroll-into-view="data.scrollId"
       :refresher-enabled="true"
       :refresher-triggered="refresherTriggered"
-      enable-flex
+      :scroll-anchoring="true"
       @refresherrefresh="onRefresh"
     >
       <view class="p-2">
