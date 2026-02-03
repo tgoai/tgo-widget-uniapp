@@ -8,7 +8,7 @@ import { formatMessageTime } from '@/utils/time'
 import ChatLoading from './ChatLoading.vue'
 // @ts-ignore
 import Markdown from './Markdown.vue'
-import SystemMessage from './SystemMessage.vue'
+import SystemMessage from './messages/SystemMessage.vue'
 
 const props = defineProps({
   item: {

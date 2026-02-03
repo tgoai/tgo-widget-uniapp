@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type { SystemMessageExtra } from '@/types/chat'
+import { useI18n } from 'vue-i18n'
 import { formatSystemMessageContent } from '@/types/chat'
+
+const props = defineProps<SystemMessageProps>()
+
+const { t } = useI18n()
 
 interface SystemMessageProps {
   type: number
   content: string
   extra?: SystemMessageExtra[]
 }
-const props = defineProps<SystemMessageProps>()
-
 const formattedContent = computed(() => {
   const params: Record<string, string> = {}
   if (props.extra && Array.isArray(props.extra)) {
@@ -18,11 +21,14 @@ const formattedContent = computed(() => {
   }
   switch (props.type) {
     case 1000: // SYSTEM_STAFF_ASSIGNED
-      return formatSystemMessageContent(props.content, props.extra)
+      return t('system.staffAssigned', { ...params, defaultValue: formatSystemMessageContent(props.content, props.extra) })
     case 1001: // SYSTEM_SESSION_CLOSED
-      return formatSystemMessageContent(props.content, props.extra)
+      if (!props.extra || props.extra.length === 0) {
+        return t('system.sessionClosedNoAgent', { defaultValue: 'Session ended.' })
+      }
+      return t('system.sessionClosed', { ...params, defaultValue: formatSystemMessageContent(props.content, props.extra) })
     case 1002: // SESSION_TRANSFERRED
-      return formatSystemMessageContent(props.content, props.extra)
+      return t('system.sessionTransferred', { ...params, defaultValue: formatSystemMessageContent(props.content, props.extra) })
     default:
       return formatSystemMessageContent(props.content, props.extra)
   }
@@ -31,9 +37,9 @@ const formattedContent = computed(() => {
 
 <template>
   <view class="system-message">
-    <view class="message-content">
+    <text class="message-content">
       {{ formattedContent }}
-    </view>
+    </text>
   </view>
 </template>
 
@@ -43,10 +49,12 @@ const formattedContent = computed(() => {
     align-items: center;
     justify-content: center;
     .message-content {
-      padding: 10rpx;
-      color: #333;
-      font-style: italic;
+      padding: 14rpx 20rpx;
+      color: #666;
       text-align: center;
+      background-color: #f0f0f0;
+      border-radius: 999px;
+      font-size: 26rpx;
     }
   }
 </style>
