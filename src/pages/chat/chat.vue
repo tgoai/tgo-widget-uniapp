@@ -41,9 +41,14 @@ const data = reactive({
 // 监听messages变化，滚动到最后一条消息
 watch(
   () => messages.value,
-  (newMessages) => {
+  (newMessages, oldMessages) => {
     if (newMessages.length > 0) {
-      setScrollbarPosition()
+      let id = ''
+      if (oldMessages && oldMessages.length > 0) {
+        id = oldMessages[0].id
+        console.log('[Chat] Loading history, scrolling to first old message', id)
+      }
+      setScrollbarPosition(`mg-${id}`)
       console.log('[Chat] New message received, scrolling to bottom')
     }
   },
@@ -53,11 +58,11 @@ watch(
   },
 )
 
-function setScrollbarPosition() {
+function setScrollbarPosition(id = '') {
   data.scrollId = ''
   nextTick(async () => {
     if (refresherTriggered.value) {
-      return data.scrollId = ''
+      return data.scrollId = id
     }
     data.scrollId = 'last-scrollItem'
   })
@@ -80,6 +85,7 @@ const refresherTriggered = ref(false)
 async function onRefresh() {
   refresherTriggered.value = true
   await chatStore.loadMoreHistory()
+  console.log('[Chat] Refresh completed', refresherTriggered)
   refresherTriggered.value = false
 }
 
@@ -207,7 +213,7 @@ onBeforeUnmount(() => {
     >
       <view class="p-2">
         <template v-for="item in messages" :key="item.id">
-          <Bubble :item="item" />
+          <Bubble :id="`mg-${item.id}`" :item="item" />
         </template>
       </view>
 
