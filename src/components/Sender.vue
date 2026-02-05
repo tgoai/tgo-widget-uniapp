@@ -24,7 +24,7 @@ function onKeyboardheightchange(e: any) {
 const style = computed(() => {
   const flag = keyboardHeight.value > 0
   const height = flag
-    ? `calc(5rpx + ${keyboardHeight.value}px)`
+    ? `calc(20rpx + ${keyboardHeight.value}px)`
     : `calc(10rpx + env(safe-area-inset-bottom))`
   return `padding-bottom: ${height}; `
 })
