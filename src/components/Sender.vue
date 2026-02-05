@@ -48,7 +48,13 @@ function onCancelSend() {
   }
 }
 
+/**
+ * 显示更多
+ */
 const isShowMore = ref(false)
+function onMore() {
+  isShowMore.value = !isShowMore.value
+}
 // 选择照片
 function onPhoto() {
   uni.chooseImage({
@@ -56,6 +62,7 @@ function onPhoto() {
     success: (res: any) => {
       console.log('[Sender] chooseImage success:', res)
       chatStore.uploadUinFiles(res.tempFilePaths as string[], true)
+      isShowMore.value = false
     },
   })
 }
@@ -66,6 +73,7 @@ function onVideo() {
     success: (res: any) => {
       console.log('[Sender] chooseVideo success:', res)
       chatStore.uploadUinFiles([res.tempFilePath], false)
+      isShowMore.value = false
     },
   })
 }
@@ -87,12 +95,28 @@ function onVideo() {
         @confirm="onSend"
         @keyboardheightchange="onKeyboardheightchange"
       >
-      <wd-button v-if="!isSend" custom-class="!min-w-auto !px-[14rpx]" @click="onSend">
-        <view class="i-carbon:send-alt-filled text-[38rpx]"></view>
-      </wd-button>
-      <wd-button v-else custom-class="!min-w-auto !px-[14rpx]" @click="onCancelSend">
-        <view class="i-carbon:stop-filled text-[38rpx]"></view>
-      </wd-button>
+      <view class="flex items-center">
+        <wd-button
+          type="icon"
+          custom-class="!min-w-auto !px-[14rpx]"
+          @click="onMore"
+        >
+          <view v-if="!isShowMore" class="i-carbon:add-alt text-[46rpx]"></view>
+          <view v-else class="i-carbon:close-outline text-[46rpx]"></view>
+        </wd-button>
+
+        <wd-button
+          v-if="!isSend"
+          custom-class="!min-w-auto !px-[14rpx]"
+          :disabled="msg ? false : true"
+          @click="onSend"
+        >
+          <view class="i-carbon:send-alt-filled text-[38rpx]"></view>
+        </wd-button>
+        <wd-button v-else custom-class="!min-w-auto !px-[14rpx]" @click="onCancelSend">
+          <view class="i-carbon:stop-filled text-[38rpx]"></view>
+        </wd-button>
+      </view>
     </view>
     <view v-if="isShowMore" class="box-border h-300rpx flex gap-8 py-3">
       <view class="flex flex-col items-center" @click="onPhoto">
